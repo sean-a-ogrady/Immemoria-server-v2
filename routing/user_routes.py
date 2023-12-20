@@ -1,5 +1,6 @@
 from flask import Flask, request, make_response, jsonify
-from models.db_models.salesperson_model import Salesperson, db
+from models.model_config import db
+from models.database_models.user import User
 from sqlalchemy.exc import IntegrityError
 import bcrypt
 import re

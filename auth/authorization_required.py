@@ -1,7 +1,6 @@
 from flask import make_response, session
 from models.model_config import db
-from app import app
-from models import User
+from models.database_models.user import User
 from functools import partial, wraps
 
 #######################################################

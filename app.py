@@ -4,7 +4,9 @@ from flask_cors import CORS
 from models.model_config import db
 from auth.authorization_required import authorization_required
 from routing.user_routes import UserRoutes
-from models.user import User
+from models.database_models.user import User
+from models.database_models.save_file import SaveFile
+from models.database_models.input_exchange import InputExchange
 
 # Initialize Flask app and SQLAlchemy database
 app = Flask(__name__)
@@ -12,6 +14,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.json.compact = False
 migrate = Migrate(app, db)
+db.init_app(app)
 CORS(app, supports_credentials=True)
 app.secret_key = "secret" # TODO: Change this to something more secure, like a randomly generated UUID
 

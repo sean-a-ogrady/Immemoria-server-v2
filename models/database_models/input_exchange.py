@@ -3,8 +3,6 @@ from sqlalchemy.orm import validates
 from flask_sqlalchemy import SQLAlchemy
 from models.model_config import db
 from models.base_validator_mixin import BaseValidatorMixin
-from models.database_models.user import User
-from models.database_models.save_file import SaveFile
 
 class InputExchange(db.Model, SerializerMixin, BaseValidatorMixin):
     __tablename__ = "input_exchange_table"
