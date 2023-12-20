@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from models.model_config import db
 from auth.authorization_required import authorization_required
-from routes.user_routes import UserRoutes
+from routing.user_routes import UserRoutes
 from models.user import User
 
 # Initialize Flask app and SQLAlchemy database
@@ -63,20 +63,23 @@ def login_user():
 
 @app.route("/logout", methods=["DELETE"])
 def logout_user():
-    session.clear()
+    session["user_id"] = None
     return make_response({"message": "Logout successful"}, 200)
 
 ########################################################################
 ##################### Base Authorization Routes ########################
 ########################################################################
 
-
+@app.route("/api/get_current_user", methods=["GET"])
+@authorization_required
+def get_current_user():
+    return UserRoutes.get_current_user(session.get("user_id"))
 
 ########################################################################
 ########################### Admin Routes ###############################
 ########################################################################
 
-@app.route("/users", methods=["GET"])
+@app.route("/api/users", methods=["GET"])
 @authorization_required
 def get_users():
     return UserRoutes.get_users()
