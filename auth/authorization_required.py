@@ -8,7 +8,8 @@ from functools import partial, wraps
 ################ AUTHORIZATION LEVELS #################
 #######################################################
 
-BASE_AUTHORIZED_OPERATIONS=["auth_test"] # TODO
+BASE_AUTHORIZED_OPERATIONS=[] # TODO
+ADMIN_AUTHORIZED_OPERATIONS=["get_users"] # TODO
 
 #######################################################
 ###### EXPORTABLE MIDDLEWARE UTILITY FUNCTION(S) ######

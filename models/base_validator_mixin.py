@@ -44,3 +44,19 @@ class BaseValidatorMixin:
         if value is not None and value not in choices:
             raise ValueError(f"{key} must be one of {', '.join(choices)}")
         return value
+
+    @staticmethod
+    def validate_float(key: str, value: float, min_value: float = None, max_value: float = None, decimal_points: int = None, nullable: bool = False) -> float:
+        """Validates that value is a float and, if provided, is within the specified range."""
+        if value is None and not nullable:
+            raise ValueError(f"{key} cannot be None")
+        if value is not None:
+            if not isinstance(value, float):
+                raise ValueError(f"{key} must be a float")
+            if min_value is not None and value < min_value:
+                raise ValueError(f"{key} must be greater than or equal to {min_value}")
+            if max_value is not None and value > max_value:
+                raise ValueError(f"{key} must be less than or equal to {max_value}")
+            if decimal_points is not None and len(str(value).split(".")[1]) > decimal_points:
+                raise ValueError(f"{key} must have no more than {decimal_points} decimal points")
+        return value

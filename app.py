@@ -32,56 +32,54 @@ def index():
 
 @app.route("/signup", methods=["POST"])
 def add_user():
-    if request.method == "POST":
-        payload = request.get_json()
+    payload = request.get_json()
 
-        email_address = payload.get("email_address")
-        username = payload.get("username")
-        password = payload.get("password")
+    email_address = payload.get("email_address")
+    username = payload.get("username")
+    password = payload.get("password")
 
-        # Call the add_user method from UserRoutes
-        response = UserRoutes.add_user(
-            email_address,
-            username,
-            password
-        )
+    # Call the add_user method from UserRoutes
+    response = UserRoutes.add_user(email_address, username, password)
+    return response
 
-        return response
-    else:
-        return make_response({"error": f"Invalid request type. (Expected POST; received {request.method}.)"}, 400)
 
 @app.route("/login", methods=["POST"])
 def login_user():
-    if request.method == "POST":
-        payload = request.get_json()
+    payload = request.get_json()
 
-        matching_user = user.query.filter(user.email_address.like(f"%{payload['email_address']}%")).first()
+    matching_user = user.query.filter(user.email_address.like(f"%{payload['email_address']}%")).first()
 
-        AUTHENTICATION_IS_SUCCESSFUL = bcrypt.checkpw(
-            password=payload["password"].encode("utf-8"),
-            hashed_password=matching_user.password.encode("utf-8")
-        )
+    AUTHENTICATION_IS_SUCCESSFUL = bcrypt.checkpw(
+        password=payload["password"].encode("utf-8"),
+        hashed_password=matching_user.password.encode("utf-8")
+    )
 
-        if matching_user is not None and AUTHENTICATION_IS_SUCCESSFUL:
-            session["user_id"] = matching_user.id
-            return make_response(
-                {
-                    "message": "Login successful",
-                    "user": matching_user.to_dict(only=only)
-                }
-            , 200)
-        else:
-            return make_response({"error": "Invalid credentials."}, 401)
+    if matching_user is not None and AUTHENTICATION_IS_SUCCESSFUL:
+        session["user_id"] = matching_user.id
+        return make_response({"message": "Login successful", "user": matching_user.to_dict(only=only)}, 200)
     else:
-        return make_response({"error": f"Invalid request type. (Expected POST; received {request.method}.)"}, 400)
+        return make_response({"error": "Invalid credentials."}, 401)
+
 
 @app.route("/logout", methods=["DELETE"])
 def logout_user():
-    if request.method == "DELETE":
-        session.clear()
-        return make_response({"message": "Logout successful"}, 200)
-    else:
-        return make_response({"error": f"Invalid request type. (Expected DELETE; received {request.method}.)"}, 400)
+    session.clear()
+    return make_response({"message": "Logout successful"}, 200)
+
+########################################################################
+##################### Base Authorization Routes ########################
+########################################################################
+
+
+
+########################################################################
+########################### Admin Routes ###############################
+########################################################################
+
+@app.route("/users", methods=["GET"])
+@authorization_required
+def get_users():
+    return UserRoutes.get_users()
 
 ########################################################################
 ########################## Error Handling ##############################
