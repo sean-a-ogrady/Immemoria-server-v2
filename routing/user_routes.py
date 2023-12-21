@@ -24,20 +24,20 @@ class UserRoutes():
             new_user = User(
                 email_address=email_address,
                 username=username,
-                password=hashed_password
+                password=hashed_password.decode("utf-8")
             )
 
             # Add the new user to the database
             db.session.add(new_user)
             db.session.commit()
 
-            return make_response({"message": "User created successfully", "user": new_user.to_dict(only=only)}, 201)
+            return make_response({"message": "User created successfully", "user": new_user.to_dict()}, 201)
         except IntegrityError:
             db.session.rollback()
             return make_response({"message": "User already exists"}, 409)
-        except ValueError:
+        except ValueError as error:
             db.session.rollback()
-            return make_response({"message": "Invalid request"}, 400)
+            return make_response(jsonify({"error": str(error)}), 400)
 
     @staticmethod
     def get_current_user(user_id):
@@ -46,6 +46,6 @@ class UserRoutes():
             current_user = User.query.filter(User.id == user_id).first()
             if current_user is None:
                 return make_response({"message": "User not found"}, 404)
-            return make_response({"message": "User retrieved successfully", "user": current_user.to_dict(only=only)}, 200)
+            return make_response({"message": "User retrieved successfully", "user": current_user.to_dict()}, 200)
         except Exception as error:
             return make_response({"message": "Something went wrong", "details": str(error)}, 500)

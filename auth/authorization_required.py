@@ -37,7 +37,8 @@ def authorization_required(func=None):
             return make_response({"error": f"Something went wrong.", "details": str(error)}, 500)
 
         # Invoke wrapped view function with administrative access as output.
-        return func(authorized_user.to_dict(), *args, **kwargs)
+        # return func(authorized_user.to_dict(), *args, **kwargs)
+        return func(*args, **kwargs)
     return decorated_authorizer
 
 """

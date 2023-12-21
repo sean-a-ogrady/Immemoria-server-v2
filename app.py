@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from models.model_config import db
 from auth.authorization_required import authorization_required
+import bcrypt
 from routing.user_routes import UserRoutes
 from models.database_models.user import User
 from models.database_models.save_file import SaveFile
@@ -50,7 +51,7 @@ def add_user():
 def login_user():
     payload = request.get_json()
 
-    matching_user = user.query.filter(user.email_address.like(f"%{payload['email_address']}%")).first()
+    matching_user = User.query.filter(User.email_address.like(f"%{payload['email_address']}%")).first()
 
     AUTHENTICATION_IS_SUCCESSFUL = bcrypt.checkpw(
         password=payload["password"].encode("utf-8"),
@@ -73,10 +74,10 @@ def logout_user():
 ##################### Base Authorization Routes ########################
 ########################################################################
 
-@app.route("/api/get_current_user", methods=["GET"])
+@app.route("/api/current_user", methods=["GET"])
 @authorization_required
 def get_current_user():
-    return UserRoutes.get_current_user(session.get("user_id"))
+    return UserRoutes.get_current_user(user_id=session.get("user_id"))
 
 ########################################################################
 ########################### Admin Routes ###############################
@@ -94,6 +95,14 @@ def get_users():
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({"error": "Not found"}), 404)
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return make_response(jsonify({"error": f"Method not allowed: {error}"}), 405)
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return make_response(jsonify({"error": f"Internal server error: {error}"}), 500)
 
 ########################################################################
 ############################# Run the app ##############################
